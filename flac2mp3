@@ -1,0 +1,37 @@
+#!/bin/sh
+# Tags that you want to copy, based on the metaflac output
+TAGS=(ALBUM ARTIST DATE GENRE TITLE TRACKNUMBER)
+# Switches for tagging in your encoder, in the same order as $TAGS
+TAGSWITCHES=(--tl --ta --ty --tg --tt --tn)
+# Encoder
+ENCODER=/usr/bin/lame
+# General switches for the encoder (e.g. silent output, quality)
+ENCSWITCHES="-S -V 0 --vbr-new"
+# Switch to mark the input file as coming from stdin
+INPUT="-"
+# Switch to mark the output file for your encoder (we will fill in the actual file name)
+OUTPUT=""
+# Extension of the output filename
+OUTEXT=".mp3"
+
+# Program locations
+METAFLAC=/usr/bin/metaflac
+FLAC=/usr/bin/flac
+
+
+## YOU SHOULD NOT CHANGE ANYTHING BELOW THIS LINE
+
+
+for file in *.flac; do
+	echo -n "Encoding $file... "
+	commandline="$ENCODER $ENCSWITCHES"
+	n=${#TAGS[@]}
+	for (( i=0; i < n; ++i )); do
+		tag=${TAGS[$i]}
+		value=$($METAFLAC --show-tag "$tag" "$file" | sed 's/.*=//')
+		commandline="$commandline ${TAGSWITCHES[$i]} \"$value\""
+	done
+	commandline="$commandline $INPUT $OUTPUT \"$(basename "$file" .flac)$OUTEXT\""
+	$FLAC -d -c -s "$file" | $(eval $commandline)
+	echo done\!
+done
