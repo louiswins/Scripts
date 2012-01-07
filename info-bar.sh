@@ -31,7 +31,7 @@ PIDFILE="$DZEN_HOME/info-bar.sh.pid"
 
 # Usage: update_bar position icon text
 update_bar () {
-	local widget_sep=" :: "
+	local widget_sep="  "
 	local icon_sep=" "
 	if [ $1 -eq 1 ]; then
 		widget_sep=
