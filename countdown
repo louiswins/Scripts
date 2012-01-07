@@ -1,0 +1,77 @@
+#!/bin/sh
+
+time=5
+usefiglet=false
+
+
+isint() {
+	[ "$1" -eq "$1" 2>/dev/null ];
+}
+figclear () {
+	tput cuu 1
+	for n in 1 2 3 4 5; do
+		tput cuu 1
+		tput el
+	done
+}
+showhelp () {
+	cat <<!
+Usage: $(basename $0) [seconds] [-f]
+
+Countdown timer, displaying the remaining time each second. It can be used
+similarly to \`sleep'. Defaults to 5 seconds.
+Requires \`tput'.
+
+  Options:
+  -f
+  --figlet
+     Uses the \`figlet' program to display larger, centered text.
+
+Example usage:
+Waits 5 seconds, then takes a screenshow with \`xawtv'.
+countdown -f ; xdotool search --name Capture key j
+!
+	exit 0
+}
+
+while [ $# -ge 1 ]; do
+	case "$1" in
+		-f|--figlet)
+			usefiglet=true
+			;;
+		-h|--help)
+			showhelp
+			;;
+		*)
+			if isint "$1"; then
+				time=$1
+			else
+				echo "Unknown option $1" >&2
+			fi
+			;;
+	esac
+	shift
+done
+
+if $usefiglet; then
+	# put the cursor in the correct position for figclear
+	echo '' | figlet -tc
+fi
+for (( i=$time; i>0; --i )); do
+	if $usefiglet; then
+		figclear
+		echo $i | figlet -tc
+	else
+		echo -ne '\r'
+		tput el
+		echo -n $i;
+	fi
+	sleep 1;
+done
+# clear count for next command
+if $usefiglet; then
+	figclear
+else
+	echo -ne '\r'
+	tput el
+fi
