@@ -33,10 +33,9 @@ sub pad {
 
 
 
-my @dirs = @ARGV;
-@dirs = '.' unless @dirs;
+@ARGV = '.' unless @ARGV;
 
-foreach my $dir (@dirs) {
+foreach my $dir (@ARGV) {
 	find \&wanted, $dir;
 }
 
@@ -62,7 +61,6 @@ foreach my $i (0 .. $maxnumdups) {
 	} 0, @dups;
 }
 
-print "Duplicates:\n";
 foreach my $list (@dups) {
 	foreach my $i (0 .. $#{ $list }) {
 		print pad($list->[$i], $lengths[$i]), " ";
